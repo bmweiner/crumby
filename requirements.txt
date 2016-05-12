@@ -1,0 +1,4 @@
+Flask>=0.10.1
+Flask-SQLAlchemy>=2.1
+SQLAlchemy>=1.0.12
+geoip2>=2.2.0
