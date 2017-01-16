@@ -1,9 +1,11 @@
-"""A Flask based web analytics app."""
+"""A web analytics application."""
 
 __version__ = '0.2'
 
 import os
+import datetime
 from flask import Flask
+from flask.json import JSONEncoder
 from flask_sqlalchemy import SQLAlchemy
 from .utils import geo_ip
 
@@ -16,6 +18,37 @@ db = SQLAlchemy(app)
 
 geo = geo_ip.Geo('geolite2_city', app.config.get('GEO_DB_URI', None))
 
-import views
+from .views import general
+from .views import reporting
+from .views import tracking
 
 db.create_all()
+
+# build calendar table
+from .models import Calendar
+
+def get_dates():
+    start = datetime.date(2016, 1, 1)
+    end = datetime.date.today() + datetime.timedelta(days=365*3)
+    delta = end - start
+    return [start + datetime.timedelta(days=i) for i in range(delta.days)]
+
+Calendar.query.delete()  # truncate
+for d in get_dates():
+    db.session.add(Calendar(datetime=d))
+db.session.commit()
+
+# custom JSONEncoder
+class CustomJSONEncoder(JSONEncoder):
+    def default(self, obj):
+        try:
+            if isinstance(obj, datetime.date):
+                return obj.isoformat()
+            iterable = iter(obj)
+        except TypeError:
+            pass
+        else:
+            return list(iterable)
+        return JSONEncoder.default(self, obj)
+
+app.json_encoder = CustomJSONEncoder
