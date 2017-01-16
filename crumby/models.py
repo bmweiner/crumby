@@ -2,9 +2,18 @@
 
 from . import db
 
-class Crumb(db.Model):
-    """Record for crumbs table."""
-    __tablename__ = 'crumbs'
+class ModelMixin(object):
+   def as_dict(self):
+       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+class Calendar(db.Model, ModelMixin):
+    """Date record."""
+    __tablename__ = 'calendar'
+    datetime = db.Column(db.DateTime, primary_key=True)
+
+class Visit(db.Model, ModelMixin):
+    """Page visit record."""
+    __tablename__ = 'visits'
     id = db.Column(db.Integer, primary_key=True)
     ip = db.Column(db.String(39))
     cid = db.Column(db.String(10))
@@ -31,28 +40,14 @@ class Crumb(db.Model):
     lang = db.Column(db.String(10))
     _lang = db.Column(db.String(10))
 
-    def __init__(self, data):
-        self.ip = data.get('ip')
-        self.cid = data.get('cid')
-        self.datetime = data.get('datetime')
-        self.doc_title = data.get('doc_title')
-        self.doc_uri = data.get('doc_uri')
-        self.doc_enc = data.get('doc_enc')
-        self.referrer = data.get('referrer')
-        self._referrer = data.get('_referrer')
-        self.platform = data.get('platform')
-        self.browser = data.get('browser')
-        self.version = data.get('version')
-        self.screen_res = data.get('screen_res')
-        self.screen_depth = data.get('screen_depth')
-        self.continent = data.get('continent')
-        self.country = data.get('country')
-        self.subdivision_1 = data.get('subdivision_1')
-        self.subdivision_2 = data.get('subdivision_2')
-        self.city = data.get('city')
-        self.latitude = data.get('latitude')
-        self.longitude = data.get('longitude')
-        self.accuracy_radius = data.get('accuracy_radius')
-        self.time_zone = data.get('time_zone')
-        self.lang = data.get('lang')
-        self._lang = data.get('_lang')
+class Event(db.Model, ModelMixin):
+    """Interaction event record."""
+    __tablename__ = 'events'
+    id = db.Column(db.Integer, primary_key=True)
+    ip = db.Column(db.String(39))
+    cid = db.Column(db.String(10))
+    datetime = db.Column(db.DateTime)
+    doc_title = db.Column(db.Text)
+    doc_uri = db.Column(db.Text)
+    name = db.Column(db.Text)
+    value = db.Column(db.Text)
