@@ -66,7 +66,7 @@ def data(name=None):
         except ValueError as err:
             return jsonify(error=err)
     else:
-        today = datetime.date.today()
+        today = datetime.datetime.utcnow().date()
         if context['days']:
             days = context['days']
         else:
@@ -85,5 +85,4 @@ def data(name=None):
         context['t1'] = context['t1'].strftime('%Y-%m-%d')
 
     sql = render_template(name + '.sql', **context)
-    print(sql)
     return 	jsonify(name=name, data=query(db, sql))
