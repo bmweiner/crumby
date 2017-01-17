@@ -6,7 +6,7 @@ from (
     cid,
     platform
   from visits
-  where datetime between date("{{t0}}") and date("{{t1}}")
+  where CAST(datetime AS DATE) between date("{{t0}}") and date("{{t1}}")
   ) as v
   group by v.platform
   order by users desc
