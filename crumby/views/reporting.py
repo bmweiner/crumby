@@ -85,4 +85,5 @@ def data(name=None):
         context['t1'] = context['t1'].strftime('%Y-%m-%d')
 
     sql = render_template(name + '.sql', **context)
+    print(sql)
     return 	jsonify(name=name, data=query(db, sql))
