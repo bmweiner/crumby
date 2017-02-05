@@ -49,7 +49,7 @@ includes the following data:
 
 A public facing API is automatically configured at <domain>/data. An endpoint
 is created for each query that exists in `crumby/templates/api/`. See the
-[Setup](#Add Queries to the Public API) section for help on creating queries.
+[Setup](#add-queries-to-the-public-api) section for help on creating queries.
 
 ## Setup
 
