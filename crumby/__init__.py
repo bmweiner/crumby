@@ -16,7 +16,7 @@ app.config.from_pyfile(dev_config, silent=True)
 
 db = SQLAlchemy(app)
 
-geo = geo_ip.Geo('geolite2_city', app.config.get('GEO_DB_URI', None))
+geo = geo_ip.Geo(app.config.get('GEOIP2_DB_PATH', None))
 
 from .views import general
 from .views import reporting
