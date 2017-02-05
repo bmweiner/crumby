@@ -1,12 +1,11 @@
-# crumby
+# Crumby
 
-crumby is a self-hosted app for tracking and reporting your websites traffic.
+Crumby is a web analytics service. It performs data collection and reporting
+on the interactions between a user and a website. Crumby offers two mechanisms
+for tracking interactions: visits and events.
 
-## Tracking
-
-### Visits
-
-The following visitor data is captured:
+A visit is recorded when a user visits a page on the website and includes the
+following data:
 
   * General
     * Visitor ID (cookie)
@@ -34,90 +33,170 @@ The following visitor data is captured:
     * Geo accuracy
     * Time zone
 
-### Events
+An event is recorded during a specific HTML event (e.g. button click) and
+includes the following data:
 
-Custom user events (e.g. clicks) can also be captured through cmb.event.
+  * General
+    * Visitor ID (cookie)
+    * IP address
+    * Date and time
+  * Page
+    * Title
+    * URI
+  * Event
+    * Name
+    * Value
+
+A public facing API is automatically configured at <domain>/data. An endpoint
+is created for each query that exists in `crumby/templates/api/`. See the
+[Setup](#Add Queries to the Public API) section for help on creating queries.
 
 ## Setup
 
-### Deploy Crumby
+### Install SQL Database
 
-#### OpenShift
+Crumby stores interaction data in an SQL database. Install a database supported
+by [SQL Alchemy](http://docs.sqlalchemy.org/en/latest/dialects/index.html) and
+specify the database URI in `config.py`.
 
-    rhc app create -s crumby python-2.7 mysql-5.5 --from-code https://github.com/bmweiner/crumby.git
+### Download GeoIP2 Database
 
-Geolocation data is obtained from the binary MaxMind DB:
-[GeoLite2 City](https://dev.maxmind.com/geoip/geoip2/geolite2/).
+Crumby geolocates visits with the MaxMind geoip2 library and the
+[GeoLite2 City](https://dev.maxmind.com/geoip/geoip2/geolite2/) database.
+Download the latest binary file and specify the path to `GeoLite2-City.mmdb` in
+`config.py`.
 
-A [pre_build](.openshift/action_hooks/pre_build) script will download the latest
-database to the `$OPENSHIFT_DATA_DIR`. Upon subsequent builds, the existing
-database will be updated every 30 days. To manually update the database, delete
-the existing database and rebuild.
+### Update Configuration File
 
-#### Other
+The following values must be set in a
+[config.py](http://flask.pocoo.org/docs/0.12/config/) file located in the base
+directory.
 
-Update config.py for your server environment and follow your hosts instructions
-for deployment.
+|Value|Purpose|
+|---|---|
+|DOMAIN|The fully-qualified domain namespace of the application|
+|SQLALCHEMY_DATABASE_URI|The SQL database URI|
+|GEOIP2_DB_PATH|GeoIP2 database (GeoLite2-City.mmdb) filepath|
+|PROXY_COUNT|Number of proxy servers in front of the app|
+|CROSSDOMAIN_ORIGIN|Domain(s) permitted to query the crumby service|
 
-### Configure Website
+Store a secondary `config.py` in an
+[instance folder](http://flask.pocoo.org/docs/0.10/config/#instance-folders)
+to overwrite values declared in the base `config.py`. This is useful for local
+testing, for example:
 
-#### Tracking Visitors
+    DOMAIN = 'localhost:5000'
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://<user>@localhost/crumby'
+    GEOIP2_DB_PATH = '/Path/to/GeoLite2-City.mmdb'
+    SQLALCHEMY_ECHO = True
+    DEBUG = True
+    CROSSDOMAIN_ORIGIN = '\*'
 
-Add the following code to your page, replacing <app_url> with the crumby app
-url:
+### Run crumby
 
-    <script src="<app_url>/cmb.js" type="text/javascript"></script>
+    python run.py
 
-#### Tracking Events
+### Add Tracking Code
 
-To track events call `cmb.event` passing a name and value to track. For example:
+Add the following snippet to the webpage html, replacing <domain> with the
+fully qualified domain of the crumby application:
+
+    <script src="<domain>/cmb.js" type="text/javascript"></script>
+
+To track events, make a call to `cmb.event(name, value)` in the webpage JS. For
+example:
 
     document.getElementById('button').addEventListener('click', function() {
       cmb.event('vote', 'thumbs-up');
     });
 
-## Querying
+### Add Queries to the Public API
 
-### API
+Crumby creates two tables to store interaction data: visits and events. The
+following columns are included in each table:
 
-Add queries to `crumby/templates`
+#### Visits
 
-List all queries: `<app_url>/data`
+  * id
+  * ip
+  * cid
+  * datetime
+  * doc_title
+  * doc_uri
+  * doc_enc
+  * referrer
+  * \_referrer
+  * platform
+  * browser
+  * version
+  * screen_res
+  * screen_depth
+  * continent
+  * country
+  * subdivision_1
+  * subdivision_2
+  * city
+  * latitude
+  * longitude
+  * accuracy_radius
+  * time_zone
+  * lang
+  * \_lang
 
-Return visit data: `<app_url>/data/visits`
+#### Events
 
-## Connecting to OpenShift Database
+  * id
+  * ip
+  * cid
+  * datetime
+  * doc_title
+  * doc_uri
+  * name
+  * value
 
-    $ rhc ssh crumby
-    > mysql -u$OPENSHIFT_MYSQL_DB_USERNAME -p$OPENSHIFT_MYSQL_DB_PASSWORD -h$OPENSHIFT_MYSQL_DB_HOST
+Queries can be added to `crumby/templates/api/` to query these tables. One file
+should exist per query and must have the extension `.sql`. The name of the file
+is the name of the query. Queries will be accessible through the public
+endpoint: `<domain>/data/<query_name>`.
 
-    mysql> use crumby;
-    mysql> select * from visits;
+Queries are processed by Flask using the Jinja2 syntax. Currently, the following
+variables are provided to the context when the query is processed:
 
-or locally...
+  * t0: Start Time, default today - 30 days
+  * t1: End Time, default: today
 
-    $ rhc port-forward
-    $ mysql -u <username> -p -h <host> -P <port>
+These variables originate from the query string (i.e. days, from, to). Browse to
+`<domain>/data` for instructions on querying the public API including syntax,
+query names, and available query strings.
 
-## Testing
+For example, the following query would display the number of users and views
+for each day during the last 30 days.
 
-1. Create an [instance folder](http://flask.pocoo.org/docs/0.10/config/#instance-folders)
-for local testing:
+    SELECT date(datetime), count(distinct cid) as users, count(id) as views
+    FROM visits
+    GROUP BY datetime
+    WHERE datetime between date("{{t0}}") and date("{{t1}}")
 
-    mkdir instance && touch instance/config.py
+## Deploy to a Platform as a Service
 
-2. Store local settings in config.py, for example:
+### OpenShift
 
-    DOMAIN = 'localhost:5000'
-    PKG = 'crumby/'
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root@localhost/crumby'
-    GEO_DB_URI = 'GeoLite2-City.mmdb'
-    SQLALCHEMY_ECHO = True
-    DEBUG = True
-    CROSSDOMAIN_ORIGIN = '\*'
+Create the application:
 
-3. start crumby `python wsgi.py`
+    rhc app create -s crumby python-2.7 mysql-5.5 --from-code https://github.com/bmweiner/crumby.git
 
-4. Send crumby some test data
+Query the database with `rhc ssh`:
 
-    curl localhost:5000/0.gif?t=visit&cid=123&doc_title=test
+    rhc ssh crumby
+    mysql -u$OPENSHIFT_MYSQL_DB_USERNAME -p$OPENSHIFT_MYSQL_DB_PASSWORD -h$OPENSHIFT_MYSQL_DB_HOST
+    use crumby;
+    select * from visits;
+
+Query the database by forwarding ports:
+
+    rhc port-forward
+    mysql -u <username> -p -h <host> -P <port>
+
+### Heroku
+
+TBD
