@@ -4,42 +4,24 @@ import geoip2.database
 
 class Geo(object):
     """Geolocate IP."""
-    def __init__(self, name, uri):
+    def __init__(self, filepath):
         """Init a Geo class.
 
         Args:
-            db: str. Database URI.
-            name: str. Database name, valid options: ['geolite2_city'].
+            filepath: The path to the GeoIP2 database, GeoLite2-City.mmdb.
         """
-        self.name = name
-        if self.name == 'geolite2_city':
-            self.conn = self.geolite2_conn(uri)
-        else:
-            warnings.warn('Unsupported geolocation DB: %s' % self.name)
+        try:
+            self.conn = geoip2.database.Reader(filepath)
+        except ValueError:
+            warnings.warn('Unable to find GeoIP2 database: %s' % filepath)
             self.conn = None
 
     def query(self, ip):
         """Query DB for IP."""
-        if ip and self.conn:
-            if self.name == 'geolite2_city':
-                return self.geolite2_city(ip)
-            else:
-                warnings.warn('Unsupported geolocation DB: %s' % self.name)
-                return {}
-        else:
+        if not ip or not self.conn:
             warnings.warn('Unable to geolocate: %s' % ip)
             return {}
 
-    def geolite2_conn(self, uri):
-        """Setup connection to GeoLite2 City DB."""
-        try:
-            return geoip2.database.Reader(uri)
-        except ValueError:
-            warnings.warn('Unable to connect geolocation DB: %s' % uri)
-            return None
-
-    def geolite2_city(self, ip):
-        """Query GeoLite2 City DB for IP."""
         data = {}
         try:
             resp = self.conn.city(ip)
