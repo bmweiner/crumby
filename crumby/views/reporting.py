@@ -28,7 +28,7 @@ def query(db, sql):
 def data(name=None):
     """Return dataset."""
     ndays = 30
-    templates = os.listdir(os.path.join(app.root_path, 'templates'))
+    templates = os.listdir(os.path.join(app.root_path, 'templates', 'api'))
     queries = [t[:-4] for t in templates if t.endswith('.sql')]
     if not name:  # return list of queries
         query_strings = ['days', 'from', 'to']
@@ -84,5 +84,5 @@ def data(name=None):
         context['t0'] = context['t0'].strftime('%Y-%m-%d')
         context['t1'] = context['t1'].strftime('%Y-%m-%d')
 
-    sql = render_template(name + '.sql', **context)
+    sql = render_template(os.path.join('api', name + '.sql'), **context)
     return 	jsonify(name=name, data=query(db, sql))
