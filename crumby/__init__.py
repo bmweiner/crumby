@@ -1,7 +1,5 @@
 """A web analytics application."""
 
-__version__ = '0.2'
-
 import os
 import datetime
 from flask import Flask
