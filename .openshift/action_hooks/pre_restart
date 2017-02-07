@@ -1,0 +1,3 @@
+#!/bin/sh
+
+sh $OPENSHIFT_REPO_DIR/.openshift/action_hooks/pre_build
