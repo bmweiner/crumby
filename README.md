@@ -179,24 +179,5 @@ for each day during the last 30 days.
 
 ## Deploy to a Platform as a Service
 
-### OpenShift
-
-Create the application:
-
-    rhc app create -s crumby python-2.7 mysql-5.5 --from-code https://github.com/bmweiner/crumby.git
-
-Query the database with `rhc ssh`:
-
-    rhc ssh crumby
-    mysql -u$OPENSHIFT_MYSQL_DB_USERNAME -p$OPENSHIFT_MYSQL_DB_PASSWORD -h$OPENSHIFT_MYSQL_DB_HOST
-    use crumby;
-    select * from visits;
-
-Query the database by forwarding ports:
-
-    rhc port-forward
-    mysql -u <username> -p -h <host> -P <port>
-
-### Heroku
-
-TBD
+* [Crumby-Openshift](https://github.com/bmweiner/crumby-openshift)
+* Crumby-Heroku (pending)
