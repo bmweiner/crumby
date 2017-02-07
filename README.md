@@ -179,5 +179,7 @@ for each day during the last 30 days.
 
 ## Deploy to a Platform as a Service
 
-* [Crumby-Openshift](https://github.com/bmweiner/crumby-openshift)
-* Crumby-Heroku (pending)
+Reference the appropriate branch of crumby:
+
+* [Openshift](https://github.com/bmweiner/crumby/tree/openshift)
+* Heroku (pending)
