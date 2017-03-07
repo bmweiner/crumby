@@ -1,6 +1,20 @@
 """Crumby data models."""
 
+import sqlalchemy.types as types
+from flask.ext.login import UserMixin
 from . import db
+from . import bcrypt
+from . import login_manager
+
+class Password(types.TypeDecorator):
+    """Password type that performs hashing."""
+    impl = types.String
+
+    def process_bind_param(self, value, dialect):
+        return bcrypt.generate_password_hash(value)
+
+    def process_result_value(self, value, dialect):
+        return value
 
 class ModelMixin(object):
    def as_dict(self):
@@ -51,3 +65,22 @@ class Event(db.Model, ModelMixin):
     doc_uri = db.Column(db.Text)
     name = db.Column(db.Text)
     value = db.Column(db.Text)
+
+class User(db.Model, UserMixin):
+    """App Users."""
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(75), unique=True)
+    password = db.Column(Password(60))
+
+    def verify_password(self, password):
+        """Verify a users password.
+
+        Args:
+            password, str: Plaintext password.
+        """
+        return bcrypt.check_password_hash(self.password, password)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(user_id)

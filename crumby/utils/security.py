@@ -1,9 +1,19 @@
 """Custom Flask extensions / snippets."""
 
 from datetime import timedelta
-from flask import make_response, request, current_app
+from urlparse import urlparse
+from urlparse import urljoin
+from flask import make_response
+from flask import request
+from flask import current_app
+from flask import url_for
 from functools import update_wrapper
 
+def is_safe_url(target):
+    ref_url = urlparse(request.host_url)
+    test_url = urlparse(urljoin(request.host_url, target))
+    return test_url.scheme in ('http', 'https') and \
+           ref_url.netloc == test_url.netloc
 
 def crossdomain(origin=None, methods=None, headers=None,
                 max_age=21600, attach_to_all=True,

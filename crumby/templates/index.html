@@ -1,0 +1,45 @@
+{% extends "default.html" %}
+{% block body %}
+  <div class="container">
+    <h1>Site Report: {{ config.DOMAIN }}</h1>
+    <div class="row">
+      <div class="col-sm-10">
+        <select id="arg-tbl">
+          {% for p in private %}
+            <option value="private/{{p}}">private/{{p}}</option>
+          {% endfor %}
+          {% for p in public %}
+            <option value="public/{{p}}">public/{{p}}</option>
+          {% endfor %}
+        </select>
+        <select id="arg-days">
+            <option value="1">Day</option>
+            <option value="7">Week</option>
+            <option value="30">Month</option>
+            <option value="365">Year</option>
+        </select>
+      </div>
+      <div class="col-sm-1">
+        <a href="/api">API</a>
+      </div>
+      <div class="col-sm-1">
+        <a href="/logout">Logout</a>
+      </div>
+    </div>
+
+  <h2 id="tbl-title"></h2>
+
+  <table id="tbl-data" class="display">
+    <thead>
+      <tr>
+      </tr>
+    </thead>
+  </table>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+  <script src ="{{ url_for('static', filename='script.js') }}"></script>
+
+{% endblock %}
