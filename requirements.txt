@@ -1,7 +1,8 @@
-Flask>=0.10
+Flask>=0.12
 Flask-Bcrypt>=0.7.1
 Flask-Login>=0.4.0
 Flask-SQLAlchemy>=2.1
 Jinja2>=2.8
 SQLAlchemy>=1.1.4
+pymysql>=0.7.10
 geoip2>=2.3.0
