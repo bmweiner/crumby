@@ -4,13 +4,20 @@ import os
 import datetime
 from flask import Flask
 from flask.json import JSONEncoder
-from flask_sqlalchemy import SQLAlchemy
+from flask.ext.bcrypt import Bcrypt
+from flask.ext.login import LoginManager
+from flask.ext.sqlalchemy import SQLAlchemy
 from .utils import geo_ip
 
 app = Flask(__name__)
 app.config.from_object('config')
 dev_config = os.path.join(app.instance_path, 'config.py')
 app.config.from_pyfile(dev_config, silent=True)
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+bcrypt = Bcrypt(app)
 
 db = SQLAlchemy(app)
 
