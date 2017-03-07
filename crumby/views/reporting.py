@@ -7,20 +7,8 @@ from flask import jsonify
 from flask import render_template
 from .. import app
 from .. import db
-from ..utils.extensions import crossdomain
-
-def query(db, sql):
-    """Query Flask-SQLAlchemy DB.
-
-    Args:
-        db: flask_sqlalchemy.SQLAlchemy.
-        sql: str. Query
-
-    Returns:
-        dict: results of query
-    """
-    result = db.engine.execute(sql)
-    return [dict(zip(result.keys(), rows)) for rows in result.fetchall()]
+from ..utils.security import crossdomain
+from ..utils.database import query
 
 @app.route('/data/')
 @app.route('/data/<name>')
@@ -28,7 +16,8 @@ def query(db, sql):
 def data(name=None):
     """Return dataset."""
     ndays = 30
-    templates = os.listdir(os.path.join(app.root_path, 'templates', 'api'))
+    rel_path = os.path.join('templates', 'api', 'public')
+    templates = os.listdir(os.path.join(app.root_path, rel_path))
     queries = [t[:-4] for t in templates if t.endswith('.sql')]
     if not name:  # return list of queries
         query_strings = ['days', 'from', 'to']
@@ -84,5 +73,6 @@ def data(name=None):
         context['t0'] = context['t0'].strftime('%Y-%m-%d')
         context['t1'] = context['t1'].strftime('%Y-%m-%d')
 
-    sql = render_template(os.path.join('api', name + '.sql'), **context)
+    rel_path = os.path.join('api', 'public')
+    sql = render_template(os.path.join(rel_path, name + '.sql'), **context)
     return 	jsonify(name=name, data=query(db, sql))
