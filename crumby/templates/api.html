@@ -1,0 +1,76 @@
+{% extends "default.html" %}
+{% block body %}
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-9">
+          <a href="/api">api/</a>
+      </div>
+      <div class="col-sm-2">
+          <a href="/">Site Report</a>
+      </div>
+      <div class="col-sm-1">
+        {% if current_user.is_authenticated %}
+          <a href="/logout">Logout</a>
+        {% else %}
+          <a href="/login?next={{request.path | urlencode}}">Login</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <h1>Crumby API</h1>
+
+    <p>A REST API that allows queries against the crumby database.</p>
+
+    <h2>Collections</h2>
+      <ul>
+        <li><a href="/api/public">{{ config.DOMAIN }}/api/public</a></li>
+        <li><a href="/api/private">{{ config.DOMAIN }}/api/private</a></li>
+      </ul>
+
+    {% if collection %}
+
+      <h2>{{collection | title}} Endpoints</h2>
+
+      {% for query in queries %}
+        <ul>
+          <li><a href="/api/{{collection}}/{{query}}">{{ config.DOMAIN }}/api/{{collection}}/{{query}}</a></li>
+        </ul>
+      {% endfor %}
+
+      <h2>Query String Parameters</h2>
+
+      <h3>Date Range</h3>
+
+      <p>
+        Queries that require a date range will default to the last 30 days.
+        Provide <strong>days</strong> or <strong>from</strong> and
+        <strong>to</strong> for a custom date range.
+      </p>
+
+      <h4>days</h4>
+
+      <p>int: number of consecutive days to retrieve before today.</p>
+
+      <p>
+        Example:
+        <a href="/api/{{collection}}/locations?days=60">
+          {{ config.DOMAIN }}/api/{{collection}}/locations?days=60
+        </a>
+      </p>
+
+      <h4>from / to</h4>
+
+      <p>str in form YYY-MM-DD: start and end date of date range.</p>
+
+      <p>
+        Example:
+        <a href="/api/{{collection}}/locations?from=2016-09-01&to=2017-02-20">
+          {{ config.DOMAIN }}/api/{{collection}}/locations?from=2016-09-01&to=2017-02-20
+        </a>
+      </p>
+
+    {% endif %}
+
+  </div>
+
+{% endblock %}
