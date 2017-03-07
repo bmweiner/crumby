@@ -48,8 +48,9 @@ includes the following data:
     * Value
 
 A public facing API is automatically configured at <domain>/data. An endpoint
-is created for each query that exists in `crumby/templates/api/`. See the
-[Setup](#add-queries-to-the-public-api) section for help on creating queries.
+is created for each query that exists in `crumby/templates/api/public`.
+See the [Setup](#add-queries-to-the-public-api) section for help on creating
+queries.
 
 ## Setup
 
@@ -154,10 +155,10 @@ following columns are included in each table:
   * name
   * value
 
-Queries can be added to `crumby/templates/api/` to query these tables. One file
-should exist per query and must have the extension `.sql`. The name of the file
-is the name of the query. Queries will be accessible through the public
-endpoint: `<domain>/data/<query_name>`.
+Queries can be added to `crumby/templates/api/public` to query these
+tables. One file should exist per query and must have the extension `.sql`.
+The name of the file is the name of the query. Queries will be accessible
+through the public endpoint: `<domain>/data/<query_name>`.
 
 Queries are processed by Flask using the Jinja2 syntax. Currently, the following
 variables are provided to the context when the query is processed:
