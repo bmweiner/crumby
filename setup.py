@@ -1,6 +1,6 @@
 from setuptools import setup
 
-__version__ = '0.5'
+__version__ = '0.6'
 __description__ = 'A Flask based web analytics app'
 
 setup(name='crumby',
@@ -11,4 +11,9 @@ setup(name='crumby',
       description=__description__,
       license='MIT License',
       packages=['crumby', 'crumby.utils', 'crumby.views'],
-      install_requires=['Flask', 'Flask-SQLAlchemy', 'geoip2'])
+      install_requires=['SQLAlchemy',
+                        'Flask',
+                        'Flask-Bcrypt',
+                        'Flask-Login',
+                        'Flask-SQLAlchemy',
+                        'geoip2'])
