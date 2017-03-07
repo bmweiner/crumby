@@ -16,4 +16,5 @@ setup(name='crumby',
                         'Flask-Bcrypt',
                         'Flask-Login',
                         'Flask-SQLAlchemy',
+                        'Jinja2',
                         'geoip2'])
