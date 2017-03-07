@@ -1,4 +1,4 @@
-Flask>=0.12
+Flask>=0.10
 Flask-Bcrypt>=0.7.1
 Flask-Login>=0.4.0
 Flask-SQLAlchemy>=2.1
