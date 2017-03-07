@@ -1,4 +1,6 @@
 Flask>=0.10.1
+Flask-Bcrypt>=0.7.1
+Flask-Login>=0.4.0
 Flask-SQLAlchemy>=2.1
 SQLAlchemy>=1.0.12
 geoip2>=2.2.0
