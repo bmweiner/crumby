@@ -12,7 +12,7 @@
         {% if current_user.is_authenticated %}
           <a href="/logout">Logout</a>
         {% else %}
-          <a href="/login?next={{request.path | urlencode}}">Login</a>
+          <a href="/login?next={{request.path}}">Login</a>
         {% endif %}
       </div>
     </div>
