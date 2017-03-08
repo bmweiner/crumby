@@ -75,4 +75,4 @@ def data(name=None):
 
     rel_path = os.path.join('api', 'public')
     sql = render_template(os.path.join(rel_path, name + '.sql'), **context)
-    return 	jsonify(name=name, data=query(db, sql))
+    return 	jsonify(query(db, sql))
