@@ -15,3 +15,4 @@ PROXY_COUNT = 0
 
 CROSSDOMAIN_ORIGIN = 'http://bmweiner.com'
 
+DEBUG = True
