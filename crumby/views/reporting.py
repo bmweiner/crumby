@@ -9,10 +9,10 @@ from flask import url_for
 from flask import render_template
 from flask import flash
 from flask import abort
-from flask.ext.login import login_user
-from flask.ext.login import logout_user
-from flask.ext.login import login_required
-from flask.ext.login import current_user
+from flask_login import login_user
+from flask_login import logout_user
+from flask_login import login_required
+from flask_login import current_user
 from jinja2.exceptions import TemplateNotFound
 from .. import app
 from .. import db
@@ -41,6 +41,8 @@ def login():
             if not is_safe_url(url):
                 return abort(400)
             flash(u'Welcome {}'.format(username), 'success')
+            print('=============================================')
+            print(current_user.username)
             return redirect(url or url_for('index'))
         else:
             flash(u'Invalid login, please try again', 'warning')

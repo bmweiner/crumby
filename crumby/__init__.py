@@ -4,9 +4,9 @@ import os
 import datetime
 from flask import Flask
 from flask.json import JSONEncoder
-from flask.ext.bcrypt import Bcrypt
-from flask.ext.login import LoginManager
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask_bcrypt import Bcrypt
+from flask_login import LoginManager
+from flask_sqlalchemy import SQLAlchemy
 from .utils import geo_ip
 
 app = Flask(__name__)
