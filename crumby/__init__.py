@@ -23,7 +23,6 @@ db = SQLAlchemy(app)
 
 geo = geo_ip.Geo(app.config.get('GEOIP2_DB_PATH', None))
 
-from .views import general
 from .views import reporting
 from .views import tracking
 
