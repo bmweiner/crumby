@@ -13,5 +13,5 @@ filepath = os.environ.get('OPENSHIFT_DATA_DIR', '.')
 GEOIP2_DB_PATH = os.path.join(filepath, 'GeoLite2-City.mmdb')
 PROXY_COUNT = 0
 
-CROSSDOMAIN_ORIGIN = 'http://bmweiner.com'
+#CROSSDOMAIN_ORIGIN = 'http://bmweiner.com'
 
