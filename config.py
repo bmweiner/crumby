@@ -3,7 +3,7 @@
 import os
 
 SECRET_KEY = os.urandom(24)
-SESSION_COOKIE_SECURE = True
+#SESSION_COOKIE_SECURE = True
 DOMAIN = os.environ.get('OPENSHIFT_APP_DNS')
 
 db_url = os.environ.get('OPENSHIFT_MYSQL_DB_URL', '.')
