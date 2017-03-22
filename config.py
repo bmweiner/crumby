@@ -2,7 +2,7 @@
 
 import os
 
-SECRET_KEY = os.urandom(24)
+SECRET_KEY = "asdfasdfasdf"
 #SESSION_COOKIE_SECURE = True
 DOMAIN = os.environ.get('OPENSHIFT_APP_DNS')
 
@@ -15,4 +15,3 @@ GEOIP2_DB_PATH = os.path.join(filepath, 'GeoLite2-City.mmdb')
 PROXY_COUNT = 0
 
 CROSSDOMAIN_ORIGIN = 'http://bmweiner.com'
-
