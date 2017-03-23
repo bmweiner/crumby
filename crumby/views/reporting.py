@@ -1,4 +1,4 @@
-"""General routes."""
+"""Routes for reporting."""
 
 import datetime
 import os
