@@ -4,7 +4,7 @@ cd $OPENSHIFT_DATA_DIR
 
 # create secret key
 touch key
-cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1 | key
+cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1 > key
 
 # obtain geolite db
 rm -f GeoLite2-City.mmdb.gz
