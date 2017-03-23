@@ -1,7 +1,7 @@
 """Crumby data models."""
 
 import sqlalchemy.types as types
-from flask.ext.login import UserMixin
+from flask_login import UserMixin
 from . import db
 from . import bcrypt
 from . import login_manager
