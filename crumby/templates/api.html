@@ -3,7 +3,11 @@
   <div class="container">
     <div class="row">
       <div class="col-sm-9">
+          {% if collection %}
+          <a href="/api/{{collection}}">api/{{collection}}</a>
+          {% else %}
           <a href="/api">api/</a>
+          {% endif %}
       </div>
       <div class="col-sm-2">
           <a href="/">Site Report</a>
