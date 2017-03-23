@@ -49,7 +49,9 @@ includes the following data:
 
 A public facing API is automatically configured at <domain>/api/public. An
 endpoint is created for each query that exists in `crumby/templates/api/public`.
-See the [Setup](#add-queries-to-the-public-api) section for help on creating
+Authenticated users can access a private API at <domain>/api/private. An endpoint
+is created for each query that exists in `crumby/templates/api/private`.
+See the [Setup](#add-queries-to-the-api) section for help on creating
 queries.
 
 ## Setup
@@ -111,7 +113,7 @@ example:
       cmb.event('vote', 'thumbs-up');
     });
 
-### Add Queries to the Public API
+### Add Queries to the API
 
 Crumby creates two tables to store interaction data: visits and events. The
 following columns are included in each table:
@@ -155,10 +157,12 @@ following columns are included in each table:
   * name
   * value
 
-Queries can be added to `crumby/templates/api/public` to query these
-tables. One file should exist per query and must have the extension `.sql`.
-The name of the file is the name of the query. Queries will be accessible
-through the public endpoint: `<domain>/api/public/<query_name>`.
+Queries can be added to `crumby/templates/api/public` or
+`crumby/templates/api/private` depending on the access requirements. One file
+should exist per query and must have the extension `.sql`. The name of the file
+is the name of the query. Query results will be accessible through the public
+endpoint: `<domain>/api/public/<query_name>` or private endpoint:
+`<domain>/api/private/<query_name>` which requires authentication.
 
 Queries are processed by Flask using the Jinja2 syntax. Currently, the following
 variables are provided to the context when the query is processed:
@@ -177,6 +181,14 @@ for each day during the last 30 days.
     FROM visits
     GROUP BY datetime
     WHERE datetime between date("{{t0}}") and date("{{t1}}")
+
+### Add Users
+
+A script is included in the crumby package which adds a username and password to
+the database. These users will be permitted access to crumby endpoints requiring
+authentication.
+
+    python add_user.py <username> <password>
 
 ## Deploy to a Platform as a Service
 
