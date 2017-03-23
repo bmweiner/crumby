@@ -41,10 +41,10 @@ def login():
             if not is_safe_url(url):
                 return abort(400)
             flash(u'Welcome {}'.format(username), 'success')
-            print('=============================================')
-            print(current_user.username)
+            print('Login Passed:', current_user.username)
             return redirect(url or url_for('index'))
         else:
+            print('Login Failed:', current_user.username)
             flash(u'Invalid login, please try again', 'warning')
     return render_template('login.html')
 
