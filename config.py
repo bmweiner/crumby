@@ -4,8 +4,12 @@ import os
 
 data_dir = os.environ.get('OPENSHIFT_DATA_DIR', '.')
 
-with open(os.path.join(data_dir, 'key') as f:
-    SECRET_KEY = f.read().strip(r'\n')
+try:
+    with open(os.path.join(data_dir, 'key')) as f:
+        SECRET_KEY = f.read().strip(r'\n')
+
+except IOError:
+    pass
 
 #SESSION_COOKIE_SECURE = True
 DOMAIN = os.environ.get('OPENSHIFT_APP_DNS')
