@@ -9,10 +9,10 @@ from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from .utils import geo_ip
 
-app = Flask(__name__)
-app.config.from_object('config')
-dev_config = os.path.join(app.instance_path, 'config.py')
-app.config.from_pyfile(dev_config, silent=True)
+app = Flask(__name__, instance_relative_config=True)
+app.config.from_object('crumby.default_settings')
+app.config.from_envvar('CRUMBY_SETTINGS', silent=True)
+app.config.from_pyfile('crumby.cfg', silent=True)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
