@@ -17,5 +17,4 @@ setup(name='crumby',
                         'Flask-SQLAlchemy',
                         'Jinja2',
                         'SQLAlchemy',
-                        'pymysql',
                         'geoip2'])
