@@ -1,4 +1,5 @@
 """Geolocation of IP."""
+import os
 import warnings
 import geoip2.database
 
@@ -10,11 +11,12 @@ class Geo(object):
         Args:
             filepath: The path to the GeoIP2 database, GeoLite2-City.mmdb.
         """
-        try:
-            self.conn = geoip2.database.Reader(filepath)
-        except ValueError:
-            warnings.warn('Unable to find GeoIP2 database: %s' % filepath)
-            self.conn = None
+        self.conn = None
+        if os.path.exists(filepath):
+            try:
+                self.conn = geoip2.database.Reader(filepath)
+            except ValueError or IOError:
+                warnings.warn('Unable to init GeoIP2 database: %s' % filepath)
 
     def query(self, ip):
         """Query DB for IP."""

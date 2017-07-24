@@ -21,7 +21,7 @@ bcrypt = Bcrypt(app)
 
 db = SQLAlchemy(app)
 
-geo = geo_ip.Geo(app.config.get('GEOIP2_DB_PATH', None))
+geo = geo_ip.Geo(app.config.get('GEOIP2_DB_PATH'))
 
 from .views import reporting
 from .views import tracking
