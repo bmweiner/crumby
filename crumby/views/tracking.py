@@ -3,6 +3,7 @@
 import os
 import base64
 from datetime import datetime
+from urllib import unquote
 from flask import request
 from flask import Response
 from flask import render_template
@@ -12,13 +13,7 @@ from .. import db
 from .. import geo
 from ..models import Visit
 from ..models import Event
-
-def real_ip(request):
-    """Remove proxies from IP."""
-    remote_addr = getattr(request, 'remote_addr', None)
-    route = list(getattr(request, 'access_route', remote_addr))
-    route.reverse()
-    return route[app.config.get('PROXY_COUNT', 0)]
+from ..extensions import security
 
 # cmb.js
 with app.app_context():
@@ -43,17 +38,17 @@ def parse_query_string(gif_id):
         abort(404)
 
     query_type = request.args.get('t')
-    ip = real_ip(request)
+    ip = security.real_ip(request, app.config.get('PROXY_COUNT', 0))
 
     if query_type == 'visit':
         geo_data = geo.query(ip)
         data = dict(ip=ip,
                     cid=request.args.get('cid'),
                     datetime=datetime.utcnow(),
-                    doc_title=request.args.get('dt'),
-                    doc_uri=request.args.get('dl'),
+                    doc_title=unquote(request.args.get('dt')),
+                    doc_uri=unquote(request.args.get('dl')),
                     doc_enc=request.args.get('de'),
-                    referrer=request.args.get('dr'),
+                    referrer=unquote(request.args.get('dr')),
                     _referrer=getattr(request, 'referrer', None),
                     platform=getattr(request.user_agent, 'platform', None),
                     browser=getattr(request.user_agent, 'browser', None),

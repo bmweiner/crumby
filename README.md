@@ -79,7 +79,7 @@ directory.
 |---|---|
 |DOMAIN|The fully-qualified domain namespace of the application|
 |SQLALCHEMY_DATABASE_URI|The SQL database URI|
-|GEOIP2_DB_PATH|GeoIP2 database (GeoLite2-City.mmdb) filepath|
+|GEOIP2_DATABASE_NAME|GeoIP2 database (GeoLite2-City.mmdb) filepath|
 |PROXY_COUNT|Number of proxy servers in front of the app|
 |CROSSDOMAIN_ORIGIN|Domain(s) permitted to query the crumby service|
 
@@ -90,7 +90,7 @@ testing, for example:
 
     DOMAIN = 'localhost:5000'
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://<user>@localhost/crumby'
-    GEOIP2_DB_PATH = '/Path/to/GeoLite2-City.mmdb'
+    GEOIP2_DATABASE_NAME = '/Path/to/GeoLite2-City.mmdb'
     SQLALCHEMY_ECHO = True
     DEBUG = True
     CROSSDOMAIN_ORIGIN = '\*'

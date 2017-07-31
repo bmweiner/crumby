@@ -3,3 +3,4 @@ include pylintrc
 
 recursive-include crumby/templates *
 recursive-include crumby/static *
+recursive-include crumby/data *

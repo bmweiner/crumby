@@ -9,6 +9,14 @@ from flask import current_app
 from flask import url_for
 from functools import update_wrapper
 
+
+def real_ip(request, proxy_count=0):
+    """Remove proxies from IP."""
+    remote_addr = getattr(request, 'remote_addr', None)
+    route = list(getattr(request, 'access_route', remote_addr))
+    route.reverse()
+    return route[proxy_count]
+
 def is_safe_url(target):
     ref_url = urlparse(request.host_url)
     test_url = urlparse(urljoin(request.host_url, target))

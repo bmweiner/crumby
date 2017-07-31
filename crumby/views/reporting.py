@@ -18,11 +18,11 @@ from .. import app
 from .. import db
 from .. import login_manager
 from ..models import User
-from ..utils.security import is_safe_url
-from ..utils.security import crossdomain
-from ..utils.database import query
-from ..utils.database import parse_qstring
-from ..utils.database import query_names
+from ..extensions.security import is_safe_url
+from ..extensions.security import crossdomain
+from ..extensions.database import query
+from ..extensions.database import parse_qstring
+from ..extensions.database import query_names
 
 login_manager.login_view = 'login'
 login_manager.login_message = 'Login required.'
@@ -89,9 +89,10 @@ def api_collection(collection):
     return render_template('api.html', **context)
 
 def api_query(collection, name, request):
-    success, context = parse_qstring(request)
-    if not success:
-        return jsonify(error=context)
+    try:
+        context = parse_qstring(request)
+    except ValueError as err:
+        return jsonify(error=err)
 
     file_path = os.path.join('api', collection, name + '.sql')
     try:

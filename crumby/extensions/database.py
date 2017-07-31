@@ -41,21 +41,15 @@ def parse_qstring(request, ndays=30):
     context = {}
     if args['t0'] or args['t1']:
         if not all((args['t0'], args['t1'])):
-            return (False, 'Both from and to required')
+            raise ValueError('Both from and to required')
 
     if args['t0']:
-        try:
-            context['t0'] = strptime(args['t0'], '%Y-%m-%d')
-        except ValueError as err:
-            return (False, err)
+        context['t0'] = strptime(args['t0'], '%Y-%m-%d')
     else:
         context['t0'] = today - datetime.timedelta(ndays)
 
     if args['t1']:
-        try:
-            context['t1'] = strptime(args['t1'], '%Y-%m-%d')
-        except ValueError as err:
-            return (False, err)
+        context['t1'] = strptime(args['t1'], '%Y-%m-%d')
     else:
         context['t1'] = today
 
@@ -63,12 +57,12 @@ def parse_qstring(request, ndays=30):
         context['t0'] = context['t1'] - datetime.timedelta(args['days'])
 
     if context['t0'] > context['t1']:
-        return (False, "From > To")
+        raise ValueError("From > To")
 
     context['t0'] = context['t0'].strftime('%Y-%m-%d')
     context['t1'] = context['t1'].strftime('%Y-%m-%d')
 
-    return (True, context)
+    return context
 
 def query_names(app, collection):
     file_path = os.path.join(app.root_path, 'templates', 'api', collection)

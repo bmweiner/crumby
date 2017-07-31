@@ -3,56 +3,55 @@
 import os
 import datetime
 from flask import Flask
-from flask.json import JSONEncoder
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
-from .utils import geo_ip
+
+from .extensions import geo_ip
+from .extensions import encoding
 
 app = Flask(__name__, instance_relative_config=True)
+
 app.config.from_object('crumby.default_settings')
 app.config.from_envvar('CRUMBY_SETTINGS', silent=True)
 app.config.from_pyfile('crumby.cfg', silent=True)
 
+app.json_encoder = encoding.CustomJSONEncoder
+
 login_manager = LoginManager()
 login_manager.init_app(app)
-
 bcrypt = Bcrypt(app)
 
 db = SQLAlchemy(app)
+geo = geo_ip.Geo(app.config.get('GEOIP2_DATABASE_NAME', ''))
 
-geo = geo_ip.Geo(app.config.get('GEOIP2_DB_PATH', ''))
-
+from . import services
+from . import models
 from .views import reporting
 from .views import tracking
 
 db.create_all()
 
-# build calendar table
-from .models import Calendar
+# init or update calendar table
+Calendar = models.Calendar
+Visit = models.Visit
+end = datetime.datetime.today() + datetime.timedelta(3*365)
 
-def get_dates():
-    start = datetime.date(2016, 1, 1)
-    end = datetime.date.today() + datetime.timedelta(days=365*3)
-    delta = end - start
-    return [start + datetime.timedelta(days=i) for i in range(delta.days)]
+# calendar is empty
+if not Calendar.query.first():
+    start = datetime.datetime.today() - datetime.timedelta(365)
+    services.update_calendar(start, end)
 
-Calendar.query.delete()  # truncate
-for d in get_dates():
-    db.session.add(Calendar(datetime=d))
-db.session.commit()
+calendar_first = Calendar.query.order_by(Calendar.datetime.asc()).first()
+calendar_last = Calendar.query.order_by(Calendar.datetime.desc()).first()
+visit_first = Visit.query.order_by(Visit.datetime.asc()).first()
 
-# custom JSONEncoder
-class CustomJSONEncoder(JSONEncoder):
-    def default(self, obj):
-        try:
-            if isinstance(obj, datetime.date):
-                return obj.isoformat()
-            iterable = iter(obj)
-        except TypeError:
-            pass
-        else:
-            return list(iterable)
-        return JSONEncoder.default(self, obj)
+# visit before calendar min
+if visit_first and visit_first.datetime < calendar_first.datetime:
+    start = visit_first.datetime
+    services.update_calendar(start, end)
 
-app.json_encoder = CustomJSONEncoder
+# today after calendar max
+if datetime.datetime.today() >= calendar_last.datetime:
+    start = calendar_first.datetime
+    services.update_calendar(start, end)
