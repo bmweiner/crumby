@@ -1,9 +1,9 @@
 select
 	substr(doc_uri, instr(doc_uri, '//') + 2) as uri,
-  doc_title,
-  count(*) as views
+	doc_title,
+	count(*) as views
 from visits
-where CAST(datetime AS DATE) between date("{{t0}}") and date("{{t1}}")
+where date(datetime) between date("{{t0}}") and date("{{t1}}")
 group by uri, doc_title
 having
 	uri not like 'localhost%%' and

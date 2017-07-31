@@ -8,7 +8,7 @@ from (
     country,
 		subdivision_1 as state
   from visits
-  where CAST(datetime AS DATE) between date("{{t0}}") and date("{{t1}}")
-  ) as v
-  group by v.country, v.state
-	order by users desc
+	where date(datetime) between date("{{t0}}") and date("{{t1}}")
+) as v
+group by v.country, v.state
+order by users desc

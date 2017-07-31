@@ -11,4 +11,4 @@ left join(
 	from visits
 	group by date) v
 on date(c.datetime) = v.date
-where c.datetime between date("{{t0}}") and date("{{t1}}")
+where date(c.datetime) between date("{{t0}}") and date("{{t1}}")
