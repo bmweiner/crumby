@@ -1,51 +1,96 @@
 # Crumby
 
-Crumby is a web analytics service. It performs data collection and reporting
-on the interactions between a user and a website. Crumby offers two mechanisms
-for tracking interactions: visits and events.
+Crumby is an open source application for tracking and reporting visitor usage of
+a website. Crumby is a Flask application so it works with well known tools such
+as Apache, MySQL, and Python. Crumby includes a simple web-based frontend and a
+JSON compliant RESTful API for reporting. Queries are assigned to a public or
+private endpoint. Private queries are only accessible by authenticated users.
+
+## Architecture
+
+![architecture diagram][architecture]
+
+### Crumby Database (crumby.db)
+
+A SQL database is required to store tracking data. Any database compatible with
+SQLAlchemy can be used. The following tables will be initialized when crumby
+first runs:
+
+ * calendar - A range of dates available for queries
+ * events - Visitor interactions with the website
+ * users - Users permitted to access private queries
+ * visits - Visitors to the website
+
+#### calendar
+
+| Column    | Category | Description                  |
+|-----------|----------|------------------------------|
+| datetime  | General  | Date and time                |
+
+
+#### events
+
+| Column    | Category | Description                  |
+|-----------|----------|------------------------------|
+| id        | General  | Unique record ID             |
+| ip        | General  | IP address                   |
+| cid       | General  | Visitor ID (cookie)          |
+| datetime  | General  | Date and time event occurred |
+| doc_title | Page     | Page title                   |
+| doc_uri   | Page     | Page URI                     |
+| name      | Action   | Name of the event            |
+| value     | Action   | Value of the event           |
+
+#### users
+
+| Column   | Category | Description      |
+|----------|----------|------------------|
+| id       | General  | Unique record ID |
+| username | Login    | Username         |
+| password | Login    | Hashed password  |
+
+#### visits
+
+| Column          | Category          | Description                  |
+|-----------------|-------------------|------------------------------|
+| id              | General           | Unique record ID             |
+| ip              | General           | IP address                   |
+| cid             | General           | Visitor ID (cookie)          |
+| datetime        | General           | Date and time page accessed  |
+| doc_title       | Page              | Page title                   |
+| doc_uri         | Page              | Page URI                     |
+| doc_enc         | Page              | Encoding of page             |
+| referrer        | General           | Referrer from client browser |
+| \_referrer      | General           | Referrer from request header |
+| platform        | Hardware/Software | Browser platform             |
+| browser         | Hardware/Software | Browser name                 |
+| version         | Hardware/Software | Browser version              |
+| screen_res      | Hardware/Software | Browser screen resolution    |
+| screen_depth    | Hardware/Software | Browser screen depth         |
+| continent       | Geospatial        | Continent                    |
+| country         | Geospatial        | Country                      |
+| subdivision_1   | Geospatial        | Subdivisions                 |
+| subdivision_2   | Geospatial        | Subdivisions                 |
+| city            | Geospatial        | City                         |
+| latitude        | Geospatial        | Latitude                     |
+| longitude       | Geospatial        | Longitude                    |
+| accuracy_radius | Geospatial        | Geo accuracy                 |
+| time_zone       | Geospatial        | Time zone                    |
+| lang            | General           | Language from client browser |
+| \_lang          | General           | Language from request header |
+
+### Command Line Interface (crumby CLI)
+
 
 A visit is recorded when a user visits a page on the website and includes the
 following data:
 
-  * General
-    * Visitor ID (cookie)
-    * IP address
-    * Referrer
-    * Date and time
-    * Language
-  * Page
-    * Title
-    * URI
-    * Encoding
-  * Hardware/Software
-    * Platform
-    * Browser
-    * Browser version
-    * Screen resolution
-    * Screen depth
-  * Geospatial
-    * Continent
-    * Country
-    * Subdivisions
-    * City
-    * Latitude
-    * Longitude
-    * Geo accuracy
-    * Time zone
+
 
 An event is recorded during a specific HTML event (e.g. button click) and
 includes the following data:
 
-  * General
-    * Visitor ID (cookie)
-    * IP address
-    * Date and time
-  * Page
-    * Title
-    * URI
-  * Event
-    * Name
-    * Value
+
 
 A public facing API is automatically configured at <domain>/api/public. An
 endpoint is created for each query that exists in `crumby/templates/api/public`.
@@ -120,42 +165,11 @@ following columns are included in each table:
 
 #### Visits
 
-  * id
-  * ip
-  * cid
-  * datetime
-  * doc_title
-  * doc_uri
-  * doc_enc
-  * referrer
-  * \_referrer
-  * platform
-  * browser
-  * version
-  * screen_res
-  * screen_depth
-  * continent
-  * country
-  * subdivision_1
-  * subdivision_2
-  * city
-  * latitude
-  * longitude
-  * accuracy_radius
-  * time_zone
-  * lang
-  * \_lang
+
 
 #### Events
 
-  * id
-  * ip
-  * cid
-  * datetime
-  * doc_title
-  * doc_uri
-  * name
-  * value
+
 
 Queries can be added to `crumby/templates/api/public` or
 `crumby/templates/api/private` depending on the access requirements. One file
@@ -196,3 +210,5 @@ Reference the appropriate branch of crumby:
 
 * [Openshift](https://github.com/bmweiner/crumby/tree/openshift)
 * Heroku (pending)
+
+[architecture]: https://raw.githubusercontent.com/bmweiner/crumby/master/static/architecture.png
