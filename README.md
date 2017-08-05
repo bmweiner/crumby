@@ -8,12 +8,60 @@ private endpoint. Private queries are only accessible by authenticated users.
 
 ## Architecture
 
-![architecture diagram][architecture]
+![architecture analytics][arch_analytics]
 
-### Crumby Database (crumby.db)
+### Crumby App
+
+The Crumby app is developed with Python and Flask so it can be used with any
+server that supports the Web Server Gateway Interface (WSGI). The Crumby app
+includes a command line interface for administration, a reporting module, and
+a tracking module.
+
+### Crumby CLI
+
+The command line interface is used to administer the Crumby app, try `crumby -h`
+from the terminal to print help on this command.
+
+    usage: crumby [-h] {adduser,deluser,env,geoip,init,run,users} ...
+
+    A command line interface for the Crumby web analytics app.
+
+    positional arguments:
+      {adduser,deluser,env,geoip,init,run,users}
+        adduser             add user - grant private query access
+        deluser             delete user - revoke private query access
+        env                 display Flask configuration values
+        geoip               download latest geoip database
+        init                create template config file
+        run                 launch Crumby in development server
+        users               view list of users
+
+    optional arguments:
+      -h, --help            show this help message and exit
+
+### Reporting Module
+
+Apart from querying the database directly, visit and event records can be viewed
+at a webpage or consumed through the JSON compliant RESTful API. The default
+location for these resources is:
+
+    Webpage: https://<crumby.host>
+    API: https://<crumby.host>/api
+
+Crumby ships with some built in queries which show common tracking metrics (e.g.
+visits per day, most popular pages, visitors location of origin). These queries
+are segmented into two groups: public and private. Public queries can be
+accessed by anyone. Private queries require authentication.
+
+### Tracking Module
+
+The tracking module contains the cmb.js script and configures endpoints for
+receiving tracking data.
+
+### Crumby Database
 
 A SQL database is required to store tracking data. Any database compatible with
-SQLAlchemy can be used. The following tables will be initialized when crumby
+SQLAlchemy can be used. The following tables will be initialized when Crumby
 first runs:
 
  * calendar - A range of dates available for queries
@@ -79,136 +127,155 @@ first runs:
 | lang            | General           | Language from client browser |
 | \_lang          | General           | Language from request header |
 
-### Command Line Interface (crumby CLI)
-
-
-A visit is recorded when a user visits a page on the website and includes the
-following data:
-
-
-
-An event is recorded during a specific HTML event (e.g. button click) and
-includes the following data:
-
-
-
-A public facing API is automatically configured at <domain>/api/public. An
-endpoint is created for each query that exists in `crumby/templates/api/public`.
-Authenticated users can access a private API at <domain>/api/private. An endpoint
-is created for each query that exists in `crumby/templates/api/private`.
-See the [Setup](#add-queries-to-the-api) section for help on creating
-queries.
-
-## Setup
-
-### Install SQL Database
-
-Crumby stores interaction data in an SQL database. Install a database supported
-by [SQL Alchemy](http://docs.sqlalchemy.org/en/latest/dialects/index.html) and
-specify the database URI in `config.py`.
-
-### Download GeoIP2 Database
+### Geospatial Database (geoip.mmdb)
 
 Crumby geolocates visits with the MaxMind geoip2 library and the
 [GeoLite2 City](https://dev.maxmind.com/geoip/geoip2/geolite2/) database.
-Download the latest binary file and specify the path to `GeoLite2-City.mmdb` in
-`config.py`.
 
-### Update Configuration File
+![architecture diagram][arch_web]
 
-The following values must be set in a
-[config.py](http://flask.pocoo.org/docs/0.12/config/) file located in the base
-directory.
+### Web Pages
 
-|Value|Purpose|
-|---|---|
-|DOMAIN|The fully-qualified domain namespace of the application|
-|SQLALCHEMY_DATABASE_URI|The SQL database URI|
-|GEOIP2_DATABASE_NAME|GeoIP2 database (GeoLite2-City.mmdb) filepath|
-|PROXY_COUNT|Number of proxy servers in front of the app|
-|CROSSDOMAIN_ORIGIN|Domain(s) permitted to query the crumby service|
+Tracking visits to a webpage with Crumby is simple. Just add a pointer to the
+analytics server cmb.js script. The pointer should be included in the source
+code of any page that should be tracked, likely at the bottom of the `body` to
+allow other content to load first.
 
-Store a secondary `config.py` in an
-[instance folder](http://flask.pocoo.org/docs/0.10/config/#instance-folders)
-to overwrite values declared in the base `config.py`. This is useful for local
-testing, for example:
+    <script src="https://<crumby.host>/cmb.js"></script>
 
-    DOMAIN = 'localhost:5000'
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://<user>@localhost/crumby'
-    GEOIP2_DATABASE_NAME = '/Path/to/GeoLite2-City.mmdb'
-    SQLALCHEMY_ECHO = True
-    DEBUG = True
-    CROSSDOMAIN_ORIGIN = '\*'
+To track events (e.g. button click), make a call to `cmb.event(<name>, <value>)`
+when the event is triggered.
 
-### Run crumby
+## Getting Started
 
-    python run.py
+1. Setup WSGI Hosting Environment
 
-### Add Tracking Code
+  There are many ways to deploy flask applications like crumby. Refer to the
+  [Flask Deployment Options][flask_deployment] for several Hosted and
+  Self-hosted options. At a minimum a [WSGI server][wsgi_server] environment is
+  needed to deploy the crumby app.
 
-Add the following snippet to the webpage html, replacing <domain> with the
-fully qualified domain of the crumby application:
+2. Install a SQL Database
 
-    <script src="<domain>/cmb.js" type="text/javascript"></script>
+  * Install a database supported by [SQL Alchemy][sql_alchemy]
+  * Install associated python database drivers (e.g. pymysql)
 
-To track events, make a call to `cmb.event(name, value)` in the webpage JS. For
-example:
+3. Install Crumby
 
-    document.getElementById('button').addEventListener('click', function() {
-      cmb.event('vote', 'thumbs-up');
-    });
+  Installation will vary depending on the WSGI hosting environment selected.
 
-### Add Queries to the API
+  For hosted options, you may need the package source code, which can be found
+  on github:
 
-Crumby creates two tables to store interaction data: visits and events. The
-following columns are included in each table:
+        git clone https://github.com/bmweiner/crumby.git
 
-#### Visits
+  For self-hosted options, you may want to install Crumby from PyPI:
 
+        pip install crumby
 
+  > Note: Crumby uses the flask-bcrypt package. This package requires Python
+  > Development Headers for installation, which may or may not be installed
+  > depending on the distribution. hint: sudo yum install python-devel
 
-#### Events
+4. Install the latest geoip database
 
+        cd ~
+        crumby geoip
 
+5. Initialize a config file
 
-Queries can be added to `crumby/templates/api/public` or
-`crumby/templates/api/private` depending on the access requirements. One file
-should exist per query and must have the extension `.sql`. The name of the file
-is the name of the query. Query results will be accessible through the public
-endpoint: `<domain>/api/public/<query_name>` or private endpoint:
-`<domain>/api/private/<query_name>` which requires authentication.
+        crumby init
 
-Queries are processed by Flask using the Jinja2 syntax. Currently, the following
-variables are provided to the context when the query is processed:
+6. Edit config file
+
+        vi crumby.cfg
+
+        # domain name of web server running crumby
+        DOMAIN = 'myanalyticsserver.com'
+        # uri of the database
+        SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root@localhost/mydatabase'
+        # absolute path to geoip database
+        GEOIP2_DATABASE_NAME = '/Users/username/GeoLite2-City.mmdb'
+        # proxy hops to remove, typically 0
+        PROXY_COUNT = 0
+        # domain name of the website crumby is tracking
+        CROSSDOMAIN_ORIGIN = 'mywebsite.com'
+        # complex random value used to sign things
+        SECRET_KEY = 'mysecretkey'
+        # use secure session cookie
+        SESSION_COOKIE_SECURE = True  
+
+7. Set an environment variable named: CRUMBY_SETTINGS to the config file path
+
+        export CRUMBY_SETTINGS=/Users/username/crumby.cfg
+
+8. Deploy Crumby
+
+  Follow instructions for the [deployment options][flask_deployment] selected
+  to deploy the crumby app.
+
+## Development Server
+
+Crumby can be run in the Flask development server (not recommended for
+production) with the crumby CLI:
+
+    crumby run
+
+## Adding Queries
+
+Crumby ships with a bunch of SQL queries which live in `Crumby/templates/api`
+under a `private` and `public` directory. Public queries can be viewed by anyone
+and private queries require authentication.
+
+New queries can be added to the `public` and `private` directories. These
+queries will be automatically added to the crumby webpage and API. The following
+guidelines should be followed:
+
+  * One text file per query with the extension `.sql`
+  * The filename will be the name of the query
+  * Queries must follow the syntax of the SQL database used
+
+Refer to the [Crumby Database](#crumby-database) for table names, field names,
+and descriptions.
+
+### Advanced Queries
+
+Queries are templates processed by Flask using the Jinja2 syntax. Refer to the
+Jinja2 [Template Designer Documentation][jinja2_template] to customize your
+queries.
+
+By default, every query is passed the following variables:
 
   * t0: Start Time, default today - 30 days
   * t1: End Time, default: today
 
-These variables originate from the query string (i.e. days, from, to). Browse to
-`<domain>/api` for instructions on querying the public API including syntax,
-query names, and available query strings.
+These variables are created using query string parameters passed with a request
+to the crumby API. Refer to the crumby API `https://<crumby.host>/api/public`,
+for specifications on the API interface.
 
-For example, the following query would display the number of users and views
-for each day during the last 30 days.
+  * days, int. number of consecutive days to retrieve before today.
+  * from, str in form YYY-MM-DD. start date of date range.
+  * to, str in form YYY-MM-DD. end date of date range.
 
-    SELECT date(datetime), count(distinct cid) as users, count(id) as views
-    FROM visits
-    GROUP BY datetime
-    WHERE datetime between date("{{t0}}") and date("{{t1}}")
+This is helpful if you want to constrain a query by time, for example returning
+the count of unique users within a certain date range:
 
-### Add Users
+    SELECT date(datetime) as date, count(distinct cid) as users
+	  FROM visits
+	  GROUP BY date
+    WHERE date(datetime) between date("{{t0}}") and date("{{t1}}")
 
-A script is included in the crumby package which adds a username and password to
-the database. These users will be permitted access to crumby endpoints requiring
-authentication.
+## Adding Users
 
-    python add_user.py <username> <password>
+To view private queries, users must be authenticated. Users can be added to the
+access control list with the crumby CLI:
 
-## Deploy to a Platform as a Service
+    crumby adduser name password
 
-Reference the appropriate branch of crumby:
+[wsgi_server]: http://wsgi.readthedocs.io/en/latest/servers.html
+[sql_alchemy]: http://docs.sqlalchemy.org/en/latest/dialects/index.html
+[flask_deployment]: http://flask.pocoo.org/docs/0.12/deploying/
+[jinja2_template]: http://jinja.pocoo.org/docs/2.9/templates/#template-designer-documentation
 
-* [Openshift](https://github.com/bmweiner/crumby/tree/openshift)
-* Heroku (pending)
-
-[architecture]: https://raw.githubusercontent.com/bmweiner/crumby/master/assets/architecture.png
+[arch_web]: https://raw.githubusercontent.com/bmweiner/Crumby/master/assets/arch_web.png
+[arch_analytics]: https://raw.githubusercontent.com/bmweiner/Crumby/master/assets/arch_analytics.png
