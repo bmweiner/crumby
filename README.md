@@ -43,7 +43,7 @@ from the terminal to print help on this command.
 
 Apart from querying the database directly, visit and event records can be viewed
 at a webpage or consumed through the JSON compliant RESTful API. The default
-location for these resources is:
+locations for these resources are:
 
     Webpage: https://<crumby.host>
     API: https://<crumby.host>/api
@@ -205,13 +205,17 @@ when the event is triggered.
         # use secure session cookie
         SESSION_COOKIE_SECURE = True  
 
+  Current environment variables can be viewed with the crumby CLI:
+
+        crumby env
+
 7. Set an environment variable named: CRUMBY_SETTINGS to the config file path
 
         export CRUMBY_SETTINGS=/Users/username/crumby.cfg
 
 8. Deploy Crumby
 
-  Follow instructions for the [deployment options][flask_deployment] selected
+  Follow instructions for the [deployment option][flask_deployment] selected
   to deploy the crumby app.
 
 ## Development Server
@@ -224,7 +228,7 @@ production) with the crumby CLI:
 ## Adding Queries
 
 Crumby ships with a bunch of SQL queries which live in `Crumby/templates/api`
-under a `private` and `public` directory. Public queries can be viewed by anyone
+under the `private` or `public` directory. Public queries can be viewed by anyone
 and private queries require authentication.
 
 New queries can be added to the `public` and `private` directories. These
@@ -235,8 +239,8 @@ guidelines should be followed:
   * The filename will be the name of the query
   * Queries must follow the syntax of the SQL database used
 
-Refer to the [Crumby Database](#crumby-database) for table names, field names,
-and descriptions.
+Refer to the [Crumby Database](#crumby-database) section for table names, field
+names, and descriptions.
 
 ### Advanced Queries
 
@@ -261,16 +265,18 @@ This is helpful if you want to constrain a query by time, for example returning
 the count of unique users within a certain date range:
 
     SELECT date(datetime) as date, count(distinct cid) as users
-	  FROM visits
-	  GROUP BY date
+    FROM visits
+    GROUP BY date
     WHERE date(datetime) between date("{{t0}}") and date("{{t1}}")
 
-## Adding Users
+## Managing Users
 
-To view private queries, users must be authenticated. Users can be added to the
-access control list with the crumby CLI:
+To view private queries, users must be authenticated. Users can be listed,
+added, or removed with the crumby CLI:
 
+    crumby users
     crumby adduser name password
+    crumby deluser name
 
 [wsgi_server]: http://wsgi.readthedocs.io/en/latest/servers.html
 [sql_alchemy]: http://docs.sqlalchemy.org/en/latest/dialects/index.html
