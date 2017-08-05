@@ -211,4 +211,4 @@ Reference the appropriate branch of crumby:
 * [Openshift](https://github.com/bmweiner/crumby/tree/openshift)
 * Heroku (pending)
 
-[architecture]: https://raw.githubusercontent.com/bmweiner/crumby/master/static/architecture.png
+[architecture]: https://raw.githubusercontent.com/bmweiner/crumby/master/assets/architecture.png
