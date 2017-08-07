@@ -203,7 +203,7 @@ when the event is triggered.
         # complex random value used to sign things
         SECRET_KEY = 'mysecretkey'
         # use secure session cookie
-        SESSION_COOKIE_SECURE = True  
+        SESSION_COOKIE_SECURE = True
 
   Current environment variables can be viewed with the crumby CLI:
 
