@@ -173,9 +173,10 @@ when the event is triggered.
 
         pip install crumby
 
-  > Note: Crumby uses the flask-bcrypt package. This package requires Python
-  > Development Headers for installation, which may or may not be installed
-  > depending on the distribution. hint: sudo yum install python-devel
+  > Note: Some Crumby dependencies require extra software to build properly. If
+  > you encounter errors during install, try installing gcc, libffi, and
+  > python development headers, before installing Crumby.
+  > hint: sudo yum install gcc libffi-devel python-devel
 
 4. Install the latest geoip database
 
@@ -277,6 +278,11 @@ added, or removed with the crumby CLI:
     crumby users
     crumby adduser name password
     crumby deluser name
+
+## Deployment Examples
+
+Check out the `crumby\deployment` directory for some example deployment scripts
+and configurations.
 
 [wsgi_server]: http://wsgi.readthedocs.io/en/latest/servers.html
 [sql_alchemy]: http://docs.sqlalchemy.org/en/latest/dialects/index.html
