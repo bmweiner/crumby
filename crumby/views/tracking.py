@@ -3,6 +3,7 @@
 import os
 import base64
 from datetime import datetime
+from urlparse import urlparse
 from urllib import unquote
 from flask import request
 from flask import Response
@@ -17,7 +18,8 @@ from ..extensions import security
 
 # cmb.js
 with app.app_context():
-    cmbjs = render_template('cmb.js', domain=app.config['DOMAIN'])
+    domain = urlparse(app.config['DOMAIN']).netloc
+    cmbjs = render_template('cmb.js', domain=domain)
     cmbjs = cmbjs.replace('\n','').replace('  ','')
 
 @app.route('/cmb.js')

@@ -148,19 +148,19 @@ when the event is triggered.
 
 ## Getting Started
 
-1. Setup WSGI Hosting Environment
+1. Setup WSGI Hosting Environment:
 
   There are many ways to deploy flask applications like crumby. Refer to the
   [Flask Deployment Options][flask_deployment] for several Hosted and
   Self-hosted options. At a minimum a [WSGI server][wsgi_server] environment is
   needed to deploy the crumby app.
 
-2. Install a SQL Database
+2. Install a SQL Database:
 
   * Install a database supported by [SQL Alchemy][sql_alchemy]
   * Install associated python database drivers (e.g. pymysql)
 
-3. Install Crumby
+3. Install Crumby:
 
   Installation will vary depending on the WSGI hosting environment selected.
 
@@ -176,48 +176,61 @@ when the event is triggered.
   > Note: Some Crumby dependencies require extra software to build properly. If
   > you encounter errors during install, try installing gcc, libffi, and
   > python development headers, before installing Crumby.
-  > hint: sudo yum install gcc libffi-devel python-devel
+  > **Hint:** sudo yum install gcc libffi-devel python-devel
 
-4. Install the latest geoip database
+4. Install the latest geoip database:
 
         cd ~
         crumby geoip
 
-5. Initialize a config file
+5. Initialize an example config file and enter configuration values:
 
         crumby init
-
-6. Edit config file
-
         vi crumby.cfg
 
-        # domain name of web server running crumby
-        DOMAIN = 'myanalyticsserver.com'
-        # uri of the database
-        SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root@localhost/mydatabase'
-        # absolute path to geoip database
-        GEOIP2_DATABASE_NAME = '/Users/username/GeoLite2-City.mmdb'
-        # proxy hops to remove, typically 0
-        PROXY_COUNT = 0
-        # domain name of the website crumby is tracking
-        CROSSDOMAIN_ORIGIN = 'mywebsite.com'
-        # complex random value used to sign things
-        SECRET_KEY = 'mysecretkey'
-        # use secure session cookie
-        SESSION_COOKIE_SECURE = True
-
-  Current environment variables can be viewed with the crumby CLI:
+  See [Crumby Configuration](#crumby-configuration) for a description of available
+  configuration options. Current configuration variables values can be viewed
+  with the crumby CLI:
 
         crumby env
 
-7. Set an environment variable named: CRUMBY_SETTINGS to the config file path
+6. Tell crumby how to find the configuration file by setting an environment
+   variable named: CRUMBY_SETTINGS to the config file path:
 
         export CRUMBY_SETTINGS=/Users/username/crumby.cfg
 
-8. Deploy Crumby
+7. Deploy Crumby:
 
   Follow instructions for the [deployment option][flask_deployment] selected
   to deploy the crumby app.
+
+## Crumby Configuration
+
+Crumby uses a configuration file to setup the application environment.
+Configuration values are used by Crumby and it's dependencies at runtime. In
+addition to the following commonly used configuration values, please refer to
+[Flask][flask_config], [Flask-SQLAlchemy][flask_sqlalchemy_config], and
+[Flask-Login][flask_login_config] documentation for their respective options.
+
+Set the value of an environment variable named `CRUMBY_SETTINGS` to the location
+of the crumby configuration file and restart your server to apply changes. For
+example:
+
+    export CRUMBY_SETTINGS=/Users/username/crumby.cfg
+
+| Key                            | Type               | Default                 | Value                                                                 |
+|--------------------------------|--------------------|-------------------------|-----------------------------------------------------------------------|
+| DOMAIN                         | str                | 'localhost:5000'        | Domain name of the server where crumby is installed.                  |
+| SQLALCHEMY_DATABASE_URI        | str                | ‘sqlite:///~/crumby.db’ | SQL Database URL, follows the SQLAlchemy syntax.                      |
+| GEOIP2_DATABASE_NAME           | str                | ‘~/GeoLite2-City.mmdb’  | Absolute path to the GeoIP database.                                  |
+| SECRET_KEY                     | str                | None                    | Used to encrypt things. Must be set for SSL/TLS.                      |
+| SESSION_COOKIE_SECURE          | bool               | False                   | Controls if the cookie should be set with the secure flag.            |
+| PROXY_COUNT                    | int                | 0                       | Count of proxy server hops to remove when finding clients IP address. |
+| CROSSDOMAIN_ORIGIN             | str or<br>iterable | ‘*’                     | URL(s) permitted to access the crumby API.                            |
+| SQLALCHEMY_TRACK_MODIFICATIONS | bool               | False                   | Track modifications of objects and emit signals.                      |
+| DEBUG                          |                    | False                   | enable/disable Flask debug mode                                       |
+| SQLALCHEMY_ECHO                |                    | False                   | Log all the statements issued to stderr.                              |
+
 
 ## Development Server
 
@@ -287,6 +300,9 @@ and configurations.
 [wsgi_server]: http://wsgi.readthedocs.io/en/latest/servers.html
 [sql_alchemy]: http://docs.sqlalchemy.org/en/latest/dialects/index.html
 [flask_deployment]: http://flask.pocoo.org/docs/0.12/deploying/
+[flask_config]: http://flask.pocoo.org/docs/0.12/config/
+[flask_sqlalchemy_config]: http://flask-sqlalchemy.pocoo.org/2.1/config/
+[flask_login_config]: https://flask-login.readthedocs.io/en/latest/
 [jinja2_template]: http://jinja.pocoo.org/docs/2.9/templates/#template-designer-documentation
 
 [arch_web]: https://raw.githubusercontent.com/bmweiner/Crumby/master/assets/arch_web.png
