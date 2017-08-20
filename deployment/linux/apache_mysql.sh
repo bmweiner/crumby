@@ -11,9 +11,7 @@ yum install -y gcc libffi-devel python-devel
 yum install -y httpd24 mod24_ssl mysql56-server mod24_wsgi-python27.x86_64
 
 # install crumby in a virtualenv
-useradd -r crumby
 mkdir /var/lib/crumby
-chown -R crumby:crumby /var/lib/crumby
 virtualenv /var/lib/crumby/virtenv
 source /var/lib/crumby/virtenv/bin/activate
 pip install crumby pymysql
@@ -43,6 +41,10 @@ with open(os.path.join(base_path, 'SECRET_KEY')) as f:
 SESSION_COOKIE_SECURE = True
 CROSSDOMAIN_ORIGIN = '$crossdomain_origin'
 EOF
+
+# set crumby as owner
+useradd -r crumby
+chown -R crumby:crumby /var/lib/crumby
 
 # configure mysql
 service mysqld start
@@ -112,6 +114,6 @@ service httpd restart
 chkconfig httpd on
 chkconfig mysqld on
 
-# # remove build dependencies
-# yum erase -y gcc libffi-devel python-devel
-# yum autoremove -y
+# remove build dependencies
+yum erase -y gcc libffi-devel python-devel
+yum autoremove -y
