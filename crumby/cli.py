@@ -43,7 +43,6 @@ def env(**kwargs):
         print(item)
 
 def users(**kwargs):
-    print(os.getcwd())
     print(services.view_users())
 
 def adduser(username, password, **kwargs):
